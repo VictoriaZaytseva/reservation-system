@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<link href='../fullcalendar.min.css' rel='stylesheet' />
+<link href='../fullcalendar.print.min.css' rel='stylesheet' media='print' />
+<script src='../lib/moment.min.js'></script>
+<script src='../lib/jquery.min.js'></script>
+<script src='../fullcalendar.min.js'></script>
+<link rel="stylesheet" href="css/style.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
+<script>
+
+  $(document).ready(function() {
+
+    $('#calendar').fullCalendar({
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay,listWeek'
+      },
+      defaultDate: '2019-01-01',
+      editable: true,
+      timezone: 'local',
+      navLinks: true, // can click day/week names to navigate views
+      eventLimit: true, // allow "more" link when too many events
+      selectable: true,
+      selectHelper: true,
+      eventClick: function(calEvent, jsEvent, view) {
+          console.log("event clicked");
+          console.log(calEvent);
+          console.log(jsEvent);
+          console.log(view);
+        
+      },
+      select: function(start, end) {
+            $(".popup-overlay, .popup-content").addClass("active");
+        
+          var offset = start._d.getTimezoneOffset();
+         
+          var date = start._d.getMinutes() - offset;
+          start._d.setMinutes(date)
+          console.log(start._d.toUTCString())
+
+           $("#time").val(start._d.toUTCString());
+            $(".close").on("click", function(){
+                    $(".popup-overlay, .popup-content").removeClass("active");
+            });
+//        var title = prompt('Event Title:');
+//        var eventData;
+//        if (title) {
+//          eventData = {
+//            title: title,
+//            start: start,
+//            end: end
+//          };
+//          $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
+//        }
+//        $('#calendar').fullCalendar('unselect');
+      },
+      editable: false,
+      events: {
+        url: 'http://localhost/tccm/php/get-events.php',
+        error: function() {
+          $('#script-warning').show();
+        }
+      },
+      loading: function(bool) {
+        $('#loading').toggle(bool);
+      }
+    });
+
+  });
+
+</script>
+<style>
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+    font-size: 14px;
+  }
+
+  #script-warning {
+    display: none;
+    background: #eee;
+    border-bottom: 1px solid #ddd;
+    padding: 0 10px;
+    line-height: 40px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    color: red;
+  }
+
+  #loading {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  #calendar {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 10px;
+  }
+
+</style>
+</head>
+<body>
+
+  <div class="popup-overlay">
+  <!--Creates the popup content-->
+   <div class="popup-content">
+      <form method="post" action="http://localhost/tccm/php/create-events.php">
+          <h2>Make a reservation :</h2>
+          classroom : <input type="number" name="room" id="room"><br/><br/>
+          teacher : <input type="number" name="teacher" id="room"><br/><br/>
+          class : <input type="number" name="class" id="room"><br/><br/>
+          starttime : <input type="text" name="time" id="time" readonly><br/><br/>
+          <button type="submit" id = "submit" name="submit">Submit</button><br/> <br/>  
+
+      </form>
+      <button class="close">Close</button>    </div>
+</div>
+  <div id='loading'>loading...</div>
+
+  <div id='calendar'></div>
+
+</body>
+</html>
